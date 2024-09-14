@@ -14,12 +14,12 @@ INTERVAL = os.environ.get("INTERVAL", 300)
 URL = "https://hccapps.hobartcity.com.au/PinnacleRoad/"
 
 # Gate lookup table (example data)
-GATE_LOOKUP = {
-    1: {"name": "Gate 1", "lat": "-42.8821", "lon": "147.3272"},
-    2: {"name": "Gate 2", "lat": "-42.8721", "lon": "147.3372"},
-    3: {"name": "Gate 3", "lat": "-42.8621", "lon": "147.3472"},
-    4: {"name": "Gate 4", "lat": "-42.8521", "lon": "147.3572"},
-    5: {"name": "Gate 5", "lat": "-42.8421", "lon": "147.3672"},
+GATE_INFO = {
+    0: {"name": "Bracken Lane (Gate 1)", "lat": -42.917, "lon": 147.261},
+    1: {"name": "Below The Springs (Gate 2)", "lat": -42.912, "lon": 147.253},
+    2: {"name": "The Springs (Gate 3)", "lat": -42.914, "lon": 147.246},
+    3: {"name": "The Chalet (Gate 4)", "lat": -42.890, "lon": 147.236},
+    4: {"name": "Big Bend (Gate 5)", "lat": -42.890, "lon": 147.221},
 }
 
 
