@@ -11,4 +11,4 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run pinnacle_check.py when the container launches
-CMD ["python", "./pinnacle_check.py"]
+CMD ["python3", "./pinnacle_check.py"]
