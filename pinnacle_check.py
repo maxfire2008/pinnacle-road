@@ -3,9 +3,6 @@ import requests
 import re
 import json
 import os
-from homeassistant_api import (
-    Client,
-)  # You'll need to install the homeassistant-api package
 
 # Configuration
 HOME_ASSISTANT_URL = os.environ.get("HOME_ASSISTANT_URL")
@@ -14,12 +11,12 @@ INTERVAL = os.environ.get("INTERVAL", 300)
 URL = "https://hccapps.hobartcity.com.au/PinnacleRoad/"
 
 # Gate lookup table (example data)
-GATE_INFO = {
-    0: {"name": "Bracken Lane (Gate 1)", "lat": -42.917, "lon": 147.261},
-    1: {"name": "Below The Springs (Gate 2)", "lat": -42.912, "lon": 147.253},
-    2: {"name": "The Springs (Gate 3)", "lat": -42.914, "lon": 147.246},
-    3: {"name": "The Chalet (Gate 4)", "lat": -42.890, "lon": 147.236},
-    4: {"name": "Big Bend (Gate 5)", "lat": -42.890, "lon": 147.221},
+GATE_LOOKUP = {
+    1: {"name": "Bracken Lane (Gate 1)", "lat": -42.917, "lon": 147.261},
+    2: {"name": "Below The Springs (Gate 2)", "lat": -42.912, "lon": 147.253},
+    3: {"name": "The Springs (Gate 3)", "lat": -42.914, "lon": 147.246},
+    4: {"name": "The Chalet (Gate 4)", "lat": -42.890, "lon": 147.236},
+    5: {"name": "Big Bend (Gate 5)", "lat": -42.890, "lon": 147.221},
 }
 
 
@@ -35,8 +32,9 @@ def parse_data(html):
     # Gate closed
     gate_match = re.search(r"var closedGate = (\d+);", html)
     if gate_match:
-        closed_gate_id = int(gate_match.group(1))
-        if closed_gate_id == 1:
+        closed_gate_id = int(gate_match.group(1)) - 2
+        data["closed_gate"] = closed_gate_id
+        if closed_gate_id == 0:
             data["road_status"] = "Road open"
         else:
             gate_info = GATE_LOOKUP.get(
@@ -70,16 +68,15 @@ def post_to_home_assistant(data):
         "Content-Type": "application/json",
     }
     states = {
-        "sensor.road_status": data.get("road_status", "Unknown"),
-        "sensor.gate_name": data.get("gate_name", "Unknown"),
-        "sensor.gate_lat": data.get("gate_lat", "0"),
-        "sensor.gate_lon": data.get("gate_lon", "0"),
-        "sensor.html_info": json.dumps(data.get("html_info", {})),
+        "pinnacle_road.closed_gate": data.get("closed_gate", 0),
+        "pinnacle_road.road_status": data.get("road_status", "Unknown"),
+        "pinnacle_road.gate_name": data.get("gate_name", "Unknown"),
     }
 
     for entity, value in states.items():
+        payload = {"state": value, "attributes": {}}
         response = requests.post(
-            f"{HOME_ASSISTANT_URL}/{entity}", headers=headers, json={"state": value}
+            f"{HOME_ASSISTANT_URL}/{entity}", headers=headers, json=payload
         )
         response.raise_for_status()
 
